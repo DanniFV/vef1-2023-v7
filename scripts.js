@@ -24,7 +24,7 @@
 // https://code.visualstudio.com/docs/nodejs/working-with-javascript#_type-checking-javascript
 
 /**
- * @typedef {Object} Product
+ * @typedef {Object} product
  * @property {number} id Auðkenni vöru, jákvæð heiltala stærri en 0.
  * @property {string} title Titill vöru, ekki tómur strengur.
  * @property {string} description Lýsing á vöru, ekki tómur strengur.
@@ -79,14 +79,20 @@ const products = [
 
   // Hér gætum við bætt við fleiri vörum í byrjun.
 ];
-const newProduct = { id: products.length + 1, title:'', description:'', price: };
+const newProduct = {
+  id: products.length + 1,
+  title: 'Nafn á vörunni',
+  description: 'Lýsing á vörunni',
+  price: 1000 // Settu verðið hér
+};
+products.push(newProduct);
 console.log('Vara bætt í vörulista: ');
-console.log(formatProduct(newProduct))
+console.log(formatProduct(newProduct));
 
 // Skilgreinum hluti sem halda utan um það sem notandi ætlar að kaupa.
 
 /**
- * @typedef {Object} CartLine
+ * @typedef {Object} cartLine
  * @property {Product} product Vara í körfu.
  * @property {number} quantity Fjöldi af vöru.
  */
@@ -104,7 +110,7 @@ console.log(formatProduct(newProduct))
  * Karfa sem geymir vörur sem notandi vill kaupa.
  * @type {Cart}
  */
-const cart = {
+const Cart = {
   lines: [],
   name: null,
   address: null,
@@ -155,17 +161,12 @@ function validateInteger(num, min = 0, max = Infinity) {
  * @returns Streng sem inniheldur upplýsingar um vöru og hugsanlega fjölda af henni.
  */
 function formatProduct(product, quantity = undefined) {
-// falsy gildi:
-//blablabla
-//blablabla
-//blablabla
-//blablabla 
 
   if (quantity && quantity > 1) {
     const total = formatPrice (quantity * product.price);
     return `${product.title} - ${quantity} x ${formatPrice(product.price)} samtals ${total}` ;
 }
-  return `${product.title} - ${product.price}`;
+  return `${product.title} - ${product.price} kr.`;
 } 
 
 /**
@@ -179,49 +180,28 @@ function formatProduct(product, quantity = undefined) {
  * @param {Cart} cart Karfa til að fá upplýsingar um.
  * @returns Streng sem inniheldur upplýsingar um körfu.
  */
-function cartInfo(cart) {
-  /* Útfæra */
-.
-.
-.
-.
-.
-.
-.
-.
-..
-.
+function cartInfo(cart, products) {
+  let total = 0;
+  const lines = cart.lines.map(item => {
+    const product = products.find(p => p.id === item.product.id);
+    if (!product) return '';
 
-..
+    const itemTotal = product.price * item.quantity;
+    total += itemTotal;
 
-.
+    if (item.quantity === 1) {
+      return `${product.title} — ${product.price.toLocaleString()} kr.`;
+    }
+
+    return `${product.title} - ${item.quantity}x${product.price.toLocaleString()} kr. samtals ${itemTotal.toLocaleString()} kr.`;
+  }).filter(Boolean);
+  
+  lines.push(`Samtals: ${total.toLocaleString()} kr. `);
+  return lines.join('/n');
 }
 
-// --------------------------------------------------------
-// Föll fyrir forritið
-
-/**
- * Bætir vöru við `products` fylkið með því að biðja um upplýsingar frá notanda um:
- * - Titil, verður að vera ekki tómur strengur.
- * - Lýsingu, verður að vera ekki tómur strengur.
- * - Verð, verður að vera jákvæð heiltala stærri en 0.
- * Ef eitthvað er ekki löglegt eru birt villuskilaboð í console og hætt er í fallinu.
- * Annars er ný vara búin til og upplýsingar um hana birtar í console.
- * @returns undefined
- */
+// -------------------------------------------------
 function addProduct() {
-  // Til einföldunar gerum við ekki greinarmun á „Cancel“ og „Escape“ og tómum gildum frá notanda.
-
-  // Förum í gegnum hvort og eitt gildi sem við viljum og pössum að við höfum eitthvað gildi.
-  // Gildi sem við fáum í gegnum `prompt` eru annaðhvort `null` ef notandi ýtir á „Cancel“ eða „Esc“
-  // eða strengur.
-  // Ef við fáum ógilt gildi hættum við í fallinu með því að nota `return` sem skilar `undefined`.
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return
-  // Þetta er kallað „early exit“ og er gott til að koma í veg fyrir að þurfa að skrifa auka
-  // skilyrði í if-setningum en getur valdið vandræðum í einhverjum tilfellum.
-  // https://en.wikipedia.org/wiki/Structured_programming#Early_exit
-
-  // FUNCTION _ ÉG SKRIFAÐI ÞETTA
   const title = prompt('Titill:');
   if (!title) {
     console.error('Titill má ekki vera tómur.');
@@ -234,52 +214,45 @@ function addProduct() {
     return;
   }
 
-  // Gerum greinarmun á verði sem streng...
   const priceAsString = prompt('Verð:');
   if (!priceAsString) {
     console.error('Verð má ekki vera tómt.');
     return;
   }
 
-  // og síðan verði sem við getum unnið með sem tölu.
-  // Hér notum við `Number.parseInt` til að breyta streng í heiltölu.
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/parseInt
-  const price = Number.parseInt(priceAsString, 10);
 
-  // Athugum hvort við fáum löglega heiltölu sem er stærri en 0 með því að nota hjálparfallið okkar.
-  if (!validateInteger(price, 1)) {
-    console.error('Verð verður að vera jákvæð heiltala.');
-    return;
-  }
+  const price = validateInteger(priceAsString, 'Verð verður að vera jákvæð heiltala', 1);
+  if (price === null) return; 
 
-  // Búum til auðkenni fyrir vöruna okkar sem einfaldlega næstu heiltölu út frá fjölda vara sem við
-  // höfum nú þegar.
-  const id = products.length + 1;
+  const id = products.length +1;
 
-  // Búum til vöruna okkar sem hlut með því að nota „object literal“.
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer
-
-  // Notum jsdoc til að fá villuathugun í vscode
-
-  /** @type {Product} */
   const product = {
     id,
     title,
     description,
-    price,
+    price
   };
 
-  console.log(product)
-  // Bætum vörunni aftast við fylkið okkar.
   products.push(product);
 
-  // Birtum upplýsingar um vöru sem við bjuggum til.
-  console.info(`Vöru bætt við:\n${formatProduct(product)}`);
-
-  // Hér er ekkert return, þá skilar fallið `undefined`.
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/return
+  console.info('Vöru bætt við:\n${formatProduct(product)}');
 }
 
+function validateInteger(input, errorMessage, min = 0, max) {
+  const number = Number.parseInt(input, 10);
+  if (Number.isNaN(number) || number < min || (max !== undefined && number >= max)) {
+    console.error(errorMessage);
+    return null;
+  }
+  return number;
+}
+function formatProduct(product) {
+  return `#${product.id} ${product.title} — ${product.description} — ${formatPrice(product.price)}`;
+}
+
+function formatPrice(price) {
+  return `${price.toLocaleString()} kr.`;
+}
 /**
  * Birta lista af vörum í console.
  * @example
@@ -288,37 +261,68 @@ function addProduct() {
  * ```
  * @returns undefined
  */
-function showProducts() {
-  /* Útfæra */
-  /* Hér ætti að nota `formatPrice` hjálparfall */
+function formatProduct(product) {
+  return `#${product.id} ${product.title} — ${product.description} — ${formatPrice(product.price)}`;
 }
 
-/**
- * Bæta vöru við körfu.
- * Byrjar á að biðja um auðkenni vöru sem notandi vill bæta við körfu.
- * Ef auðkenni er ekki heiltala, eru birt villa í console með skilaboðunum:
- * „Auðkenni vöru er ekki löglegt, verður að vera heiltala stærri en 0.“
- * Ef vara finnst ekki með gefnu auðkenni, eru birt villa í console með skilaboðunum:
- * „Vara fannst ekki.“
- * Því næst er beðið um fjölda af vöru sem notandi vill bæta við körfu. Ef fjöldi er ekki heiltala
- * á bilinu `[1, 100>`, eru birtar villuskilaboð í console með skilaboðunum:
- * „Fjöldi er ekki löglegur, lágmark 1 og hámark 99.“
- * Ef vara og fjöldi eru lögleg gildi er vöru bætt við körfu. Ef vara er nú þegar í körfu er fjöldi
- * uppfærður, annars er nýrri línu bætt við körfu.
- *
- * @returns undefined
- */
+function showProducts() {
+  if (products.length === 0) {
+    console.log('Engar vörur eru til í kerfinu.');
+    return;
+  }
+
+  console.log('Vörur í boði:');
+  for (const product of products) {
+    console.log(`${product.id}: ${product.title}, ${formatPrice(product.price)}`);
+  }
+}
+
+function formatPrice(price) {
+  return `${price.toLocaleString()} kr.`;
+}
+
+
+
 function addProductToCart() {
-  const productIdAsString = prompt('Auðkenni vöru sem á að bæta í körfu:')
-  /* Útfæra */
-if (!productIdAsString){
+  const productIdAsString = prompt('Auðkenni vöru sem á að bæta í körfu:');
+  if (!productIdAsString){
   return;
 }
-  /* Hér ætti að nota `validateInteger` hjálparfall til að staðfesta gögn frá notanda */
-  const productId = Number.parseInt(products)
+
+  const productId = validateInteger(productIdAsString, 'id verður að vera heiltala');
+  if (productId === null) return;
+
+  const product = products.find(p => p.id === productId);
+  if (!product) {
+    console.error('Vara fannst ekki')
+    return;
+  }
+
+  const quantityAsString = prompt('Hversu mikið magn viltu af vörunni?');
+  const quantity = validateInteger(quantityAsString, 'Magnið þarf að vera jákvæð heiltala');
+  if (quantity === null) return;
+
+  let line = cart.lines.find(l => l.product.id === productId);
+  if (line) {
+    line.quantity += quantity;
+  } else {
+    line = {product, quantity};
+    cart.lines.push(line);
+  }
+
+  console.log(`Bætti ${quantity} stk af "${product.title}" í körfu.`);
+
+}
+
+function validateInteger(input, errorMessage, min = 1, max = Number.MAX_SAFE_INTEGER) {
+  const number = Number.parseInt(input);
+  if (Number.isNaN(number) || number < min || number > max) {
+    console.error(errorMessage);
+    return null;
+  }
+  return number;
   
-  productInCart = cart.lines.find(i)
-  /* Til að athuga hvort vara sé til í `cart` þarf að nota `cart.lines.find` */
+
 }
 
 /**
@@ -334,27 +338,48 @@ if (!productIdAsString){
  * @returns undefined
  */
 function showCart() {
-  /* Útfæra */
+  if (cart.lines.length === 0) {
+    console.log('Karfan er tóm.');
+    return;
+  }
+
+  let total = 0;
+  console.log('Þú hefur valið:');
+  for (const item of cart.lines) {
+    const product = products.find(p => p.id === item.product.id);
+    if (product) {
+      const itemTotal = product.price * item.quantity;
+      total += itemTotal;
+      console.log(`${product.title} — ${item.quantity}x${product.price.toLocaleString()} kr. samtals ${itemTotal.toLocaleString()} kr.`);
+    }
+  }
+  console.log(`Samtals: ${total.toLocaleString()} kr.`);
 }
 
-/**
- * Klárar kaup og birtir kvittun í console.
- * Ef ekkert er í körfu eru birt skilboð í console:
- * „Karfan er tóm.“
- * Annars er notandi beðinn um nafn og heimilisfang, ef annaðhvort er tómt eru birt villuskilaboð í
- * console og hætt í falli.
- * Ef allt er í lagi er kvittun birt í console með upplýsingum um pöntun og heildarverð.
- * @example
- * ```text
- * Pöntun móttekin <nafn>.
- * Vörur verða sendar á <heimilisfang>.
- *
- * HTML húfa — 5.000 kr.
- * CSS sokkar — 2x3.000 kr. samtals 6.000 kr.
- * Samtals: 11.000 kr.
- * ```
- * @returns undefined
- */
 function checkout() {
-  /* Útfæra */
+  if (cart.lines.length === 0) {
+    console.log('Karfan er tóm.');
+    return;
+  }
+
+  const name = prompt('Vinsamlegast sláðu inn nafnið þitt:');
+  if (!name) {
+    console.error('Nafn má ekki vera tómt');
+    return;
+  }
+
+  const address = prompt('Vinsamlegast sláðu inn heimilisfangið þitt:');
+  if (!address) {
+    console.error('Heimilisfang má ekki vera tómt');
+    return;
+  }
+
+  console.log(`Pöntun móttekin ${name}.`);
+  console.log(`Vörur verða sendar á ${address}.`);
+  console.log('');
+
+  showCart();
+
+  cart.lines.length = 0;
 }
+

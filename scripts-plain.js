@@ -10,7 +10,7 @@
  * Fylki af vörum sem hægt er að kaupa.
  * @type {Array<Product>}
  */
-const products = [
+const Products = [
   {
     id: 1,
     title: 'HTML húfa',
@@ -39,7 +39,7 @@ const products = [
  */
 
 /**
- * @typedef {Object} Cart
+ * @typedef {Object} cart
  * @property {Array<CartLine>} lines Fylki af línum í körfu.
  * @property {string|null} name Nafn á kaupanda ef skilgreint, annars `null`.
  * @property {string|null} address Heimilisfang kaupanda ef skilgreint, annars `null`.
