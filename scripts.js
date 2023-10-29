@@ -76,8 +76,12 @@ const products = [
     description: 'Mjög töff jakki fyrir öll sem skrifa JavaScript reglulega.',
     price: 20_000,
   },
+
   // Hér gætum við bætt við fleiri vörum í byrjun.
 ];
+const newProduct = { id: products.length + 1, title:'', description:'', price: };
+console.log('Vara bætt í vörulista: ');
+console.log(formatProduct(newProduct))
 
 // Skilgreinum hluti sem halda utan um það sem notandi ætlar að kaupa.
 
@@ -177,6 +181,20 @@ function formatProduct(product, quantity = undefined) {
  */
 function cartInfo(cart) {
   /* Útfæra */
+.
+.
+.
+.
+.
+.
+.
+.
+..
+.
+
+..
+
+.
 }
 
 // --------------------------------------------------------
@@ -202,6 +220,8 @@ function addProduct() {
   // Þetta er kallað „early exit“ og er gott til að koma í veg fyrir að þurfa að skrifa auka
   // skilyrði í if-setningum en getur valdið vandræðum í einhverjum tilfellum.
   // https://en.wikipedia.org/wiki/Structured_programming#Early_exit
+
+  // FUNCTION _ ÉG SKRIFAÐI ÞETTA
   const title = prompt('Titill:');
   if (!title) {
     console.error('Titill má ekki vera tómur.');
@@ -289,10 +309,15 @@ function showProducts() {
  * @returns undefined
  */
 function addProductToCart() {
+  const productIdAsString = prompt('Auðkenni vöru sem á að bæta í körfu:')
   /* Útfæra */
-
+if (!productIdAsString){
+  return;
+}
   /* Hér ætti að nota `validateInteger` hjálparfall til að staðfesta gögn frá notanda */
+  const productId = Number.parseInt(products)
   
+  productInCart = cart.lines.find(i)
   /* Til að athuga hvort vara sé til í `cart` þarf að nota `cart.lines.find` */
 }
 
