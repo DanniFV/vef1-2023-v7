@@ -79,17 +79,6 @@ const products = [
 
   // Hér gætum við bætt við fleiri vörum í byrjun.
 ];
-const newProduct = {
-  id: products.length + 1,
-  title: 'Nafn á vörunni',
-  description: 'Lýsing á vörunni',
-  price: 1000 // Settu verðið hér
-};
-products.push(newProduct);
-console.log('Vara bætt í vörulista: ');
-console.log(formatProduct(newProduct));
-
-// Skilgreinum hluti sem halda utan um það sem notandi ætlar að kaupa.
 
 /**
  * @typedef {Object} cartLine
@@ -180,7 +169,7 @@ function formatProduct(product, quantity = undefined) {
  * @param {Cart} cart Karfa til að fá upplýsingar um.
  * @returns Streng sem inniheldur upplýsingar um körfu.
  */
-function cartInfo(cart, products) {
+function cartInfo(cart) {
   let total = 0;
   const lines = cart.lines.map(item => {
     const product = products.find(p => p.id === item.product.id);
@@ -201,7 +190,7 @@ function cartInfo(cart, products) {
 }
 
 // -------------------------------------------------
-function addProduct() {
+function addProduct(add) {
   const title = prompt('Titill:');
   if (!title) {
     console.error('Titill má ekki vera tómur.');
@@ -302,12 +291,12 @@ function addProductToCart() {
   const quantity = validateInteger(quantityAsString, 'Magnið þarf að vera jákvæð heiltala');
   if (quantity === null) return;
 
-  let line = cart.lines.find(l => l.product.id === productId);
+  let line = Cart.lines.find(l => l.product.id === productId);
   if (line) {
     line.quantity += quantity;
   } else {
     line = {product, quantity};
-    cart.lines.push(line);
+    Cart.lines.push(line);
   }
 
   console.log(`Bætti ${quantity} stk af "${product.title}" í körfu.`);
@@ -357,7 +346,7 @@ function showCart() {
 }
 
 function checkout() {
-  if (cart.lines.length === 0) {
+  if (Cart.lines.length === 0) {
     console.log('Karfan er tóm.');
     return;
   }
@@ -378,8 +367,8 @@ function checkout() {
   console.log(`Vörur verða sendar á ${address}.`);
   console.log('');
 
-  showCart();
+  
 
-  cart.lines.length = 0;
+  Cart.lines.length = 0;
 }
 
